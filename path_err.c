@@ -14,8 +14,8 @@ char *path_err(data *dir)
 	char *out_msg;
 
 	cntr = aux_itoa(dir->num);
-	len = _strlen(dir->av[0]) + _strlen(cntr);
-	len += _strlen(dir->args[0]) + 24;
+	len = ss_strlen(dir->av[0]) + ss_strlen(cntr);
+	len += ss_strlen(dir->args[0]) + 24;
 	out_msg = malloc(sizeof(char) * (len + 1));
 	if (out_msg == 0)
 	{
@@ -23,13 +23,13 @@ char *path_err(data *dir)
 		free(cntr);
 		return (NULL);
 	}
-	_strcpy(out_msg, dir->av[0]);
-	_strcat(out_msg, ": ");
-	_strcat(out_msg, cntr);
-	_strcat(out_msg, ": ");
-	_strcat(out_msg, dir->args[0]);
-	_strcat(out_msg, ": Permission denied\n");
-	_strcat(out_msg, "\0");
+	ss_strcpy(out_msg, dir->av[0]);
+	ss_strcat(out_msg, ": ");
+	ss_strcat(out_msg, cntr);
+	ss_strcat(out_msg, ": ");
+	ss_strcat(out_msg, dir->args[0]);
+	ss_strcat(out_msg, ": Permission denied\n");
+	ss_strcat(out_msg, "\0");
 	free(cntr);
 	return (out_msg);
 }
