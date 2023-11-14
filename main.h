@@ -108,7 +108,7 @@ typedef struct cmd_builtins
 {
 	char *cmd_name;
 	int (*func)(data *dir);
-} builtin;
+} builtins;
 
 
 #endif
