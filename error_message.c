@@ -132,7 +132,7 @@ char *exit_sherr(data *dir)
 	char *out_msg;
 	char *cntr;
 
-	cntr = aux_itoa(dir->num);
+	cntr = ss_itoa(dir->num);
 	len = ss_strlen(dir->av[0]) + ss_strlen(cntr);
 	len += ss_strlen(dir->args[0]) + ss_strlen(dir->args[1]) + 23;
 	out_msg = malloc(sizeof(char) * (len + 1));
@@ -169,7 +169,7 @@ char *getenv_err(data *dir)
 	char *cntr;
 	char *err_msg;
 
-	cntr = aux_itoa(dir->num);
+	cntr = ss_itoa(dir->num);
 	err_msg = ": cannot add/remove this from environment\n";
 	len = ss_strlen(dir->av[0]) + ss_strlen(cntr);
 	len += ss_strlen(dir->args[0]) + ss_strlen(err_msg) + 4;

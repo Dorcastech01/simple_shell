@@ -13,7 +13,7 @@ char *path_err(data *dir)
 	char *cntr;
 	char *out_msg;
 
-	cntr = aux_itoa(dir->num);
+	cntr = ss_itoa(dir->num);
 	len = ss_strlen(dir->av[0]) + ss_strlen(cntr);
 	len += ss_strlen(dir->args[0]) + 24;
 	out_msg = malloc(sizeof(char) * (len + 1));
