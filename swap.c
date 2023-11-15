@@ -51,7 +51,7 @@ char *swap_char(char *input, int bool)
  * @input: input string
  * Return: no return
  */
-void add_nodes(sep_list **head_s, line_list **head_l, char *input)
+void add_nodes(op_list **head_s, line_list **head_l, char *input)
 {
 	int i;
 	char *line;
@@ -61,20 +61,20 @@ void add_nodes(sep_list **head_s, line_list **head_l, char *input)
 	for (i = 0; input[i]; i++)
 	{
 		if (input[i] == ';')
-			add_sep_node_end(head_s, input[i]);
+			add_var(head_s, input[i]);
 
 		if (input[i] == '|' || input[i] == '&')
 		{
-			add_sep_node_end(head_s, input[i]);
+			add_var(head_s, input[i]);
 			i++;
 		}
 	}
 
-	line = _strtok(input, ";|&");
+	line = ss_strtok(input, ";|&");
 	do {
 		line = swap_char(line, 1);
-		add_line_node_end(head_l, line);
-		line = _strtok(NULL, ";|&");
+		add_var(head_l, line);
+		line = ss_strtok(NULL, ";|&");
 	} while (line != NULL);
 
 }
@@ -87,10 +87,10 @@ void add_nodes(sep_list **head_s, line_list **head_l, char *input)
  * @datash: data structure
  * Return: no return
  */
-void go_next(sep_list **list_s, line_list **list_l, data_shell *datash)
+void go_next(op_list **list_s, line_list **list_l, data *dir)
 {
 	int loop_sep;
-	sep_list *ls_s;
+	op_list *ls_s;
 	line_list *ls_l;
 
 	loop_sep = 1;
@@ -99,18 +99,18 @@ void go_next(sep_list **list_s, line_list **list_l, data_shell *datash)
 
 	while (ls_s != NULL && loop_sep)
 	{
-		if (datash->status == 0)
+		if (dir->stats == 0)
 		{
-			if (ls_s->separator == '&' || ls_s->separator == ';')
+			if (ls_s->shell_operator == '&' || ls_s->shell_operator == ';')
 				loop_sep = 0;
-			if (ls_s->separator == '|')
+			if (ls_s->shell_operator == '|')
 				ls_l = ls_l->next, ls_s = ls_s->next;
 		}
 		else
 		{
-			if (ls_s->separator == '|' || ls_s->separator == ';')
+			if (ls_s->shell_operator == '|' || ls_s->shell_operator == ';')
 				loop_sep = 0;
-			if (ls_s->separator == '&')
+			if (ls_s->shell_operator == '&')
 				ls_l = ls_l->next, ls_s = ls_s->next;
 		}
 		if (ls_s != NULL && !loop_sep)
@@ -129,10 +129,10 @@ void go_next(sep_list **list_s, line_list **list_l, data_shell *datash)
  * @input: input string
  * Return: 0 to exit, 1 to continue
  */
-int split_commands(data_shell *datash, char *input)
+int split_commands(data *dir, char *input)
 {
 
-	sep_list *head_s, *list_s;
+	op_list *head_s, *list_s;
 	line_list *head_l, *list_l;
 	int loop;
 
@@ -146,22 +146,22 @@ int split_commands(data_shell *datash, char *input)
 
 	while (list_l != NULL)
 	{
-		datash->input = list_l->line;
-		datash->args = split_line(datash->input);
-		loop = exec_line(datash);
-		free(datash->args);
+		dir->user_input = list_l->cmd_line;
+		dir->args = split_line(dir->user_input);
+		loop = exec_cmds(dir);
+		free(dir->args);
 
 		if (loop == 0)
 			break;
 
-		go_next(&list_s, &list_l, datash);
+		go_next(&list_s, &list_l, dir);
 
 		if (list_l != NULL)
 			list_l = list_l->next;
 	}
 
-	free_sep_list(&head_s);
-	free_line_list(&head_l);
+	free_op_list(&head_s);
+	free_linelist(&head_l);
 
 	if (loop == 0)
 		return (0);
@@ -181,7 +181,7 @@ char **split_line(char *input)
 	char **tokens;
 	char *token;
 
-	bsize = TOK_BUFSIZE;
+	bsize = TOKEN_BUFSIZE;
 	tokens = malloc(sizeof(char *) * (bsize));
 	if (tokens == NULL)
 	{
@@ -189,22 +189,22 @@ char **split_line(char *input)
 		exit(EXIT_FAILURE);
 	}
 
-	token = _strtok(input, TOK_DELIM);
+	token = ss_strtok(input, TOK_DELIM);
 	tokens[0] = token;
 
 	for (i = 1; token != NULL; i++)
 	{
 		if (i == bsize)
 		{
-			bsize += TOK_BUFSIZE;
-			tokens = _reallocdp(tokens, i, sizeof(char *) * bsize);
+			bsize += TOKEN_BUFSIZE;
+			tokens = ss_reallocptr(tokens, i, sizeof(char *) * bsize);
 			if (tokens == NULL)
 			{
 				write(STDERR_FILENO, ": allocation error\n", 18);
 				exit(EXIT_FAILURE);
 			}
 		}
-		token = _strtok(NULL, TOK_DELIM);
+		token = ss_strtok(NULL, TOKEN_DELIMETER);
 		tokens[i] = token;
 	}
 
